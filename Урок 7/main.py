@@ -49,12 +49,38 @@ class Matrix(object):
                 result += "|\n"
         return result
 
+    def __repr__(self) -> str:
+        return f"Matrix object: size {self.__height}x{self.__width}"
+
+    @property
+    def width(self):
+        return self.__width
+
+    @property
+    def height(self):
+        return self.__height
+
+    def __add__(self, other) -> 'Matrix':
+        if self.__width != other.width or self.__height != other.height:
+            raise ValueError("Sizes of matrices must be the same.")
+        result = []
+        for row in range(self.__height):
+            tmp_row = []
+            for column in range(self.__width):
+                tmp_row.append(self[row, column] + other[row, column])
+            result.append(tmp_row)
+        return Matrix(result)
+
 
 def case_1():
-    matrix = Matrix([[0, 1, 2],
-                     [2, 3, 4],
-                     [3, 4, 5]])
-    print(matrix)
+    matrix1 = Matrix([[0, 1, 2],
+                      [2, 3, 4],
+                      [3, 4, 5]])
+    print(matrix1)
+    matrix2 = Matrix([[1, 1, 1],
+                      [1, 1, 1],
+                      [1, 1, 1]])
+    print(matrix1+matrix2)
 
 
 if __name__ == "__main__":
