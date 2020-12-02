@@ -3,6 +3,8 @@
 
 from typing import List
 from abc import ABC, abstractmethod
+from math import ceil
+
 
 # 1. Реализовать класс Matrix (матрица). Обеспечить перегрузку конструктора класса (метод init()), который должен
 # принимать данные (список списков) для формирования матрицы.
@@ -35,7 +37,7 @@ class Matrix(object):
             raise ValueError("Indices must be integer")
         if keys[0] > self.__height or keys[0] < 0 or keys[1] > self.__width or keys[1] < 0:
             raise KeyError("Index is wrong")
-        if not isinstance(value):
+        if not isinstance(value, int):
             raise ValueError("Value must be int")
         self.__inner[keys[0] * self.__width + keys[1]] = value
 
@@ -60,8 +62,8 @@ class Matrix(object):
     def height(self):
         return self.__height
 
-    def __add__(self, other) -> 'Matrix':
-        if self.__width != other.width or self.__height != other.height:
+    def __add__(self, other: 'Matrix') -> 'Matrix':
+        if self.__width != other.__width or self.__height != other.__height:
             raise ValueError("Sizes of matrices must be the same.")
         result = []
         for row in range(self.__height):
@@ -133,8 +135,70 @@ def case_2():
     print(f"Для костюма на рост 182 пойдёт {new_suit.tissue_consumption:.2f} ткани.")
 
 
+# 3. Реализовать программу работы с органическими клетками, состоящими из ячеек. Необходимо создать класс Клетка. В его
+# конструкторе инициализировать параметр, соответствующий количеству ячеек клетки (целое число). В классе должны быть
+# реализованы методы перегрузки арифметических операторов: сложение (add()), вычитание (sub()), умножение (mul()),
+# деление (truediv()). Данные методы должны применяться только к клеткам и выполнять увеличение, уменьшение, умножение и
+# целочисленное (с округлением до целого) деление клеток, соответственно. В классе необходимо реализовать метод
+# make_order(), принимающий экземпляр класса и количество ячеек в ряду. Данный метод позволяет организовать ячейки по
+# рядам. Метод должен возвращать строку вида *****\n*****\n*****..., где количество ячеек между \n равно переданному
+# аргументу. Если ячеек на формирование ряда не хватает, то в последний ряд записываются все оставшиеся.
+class Cell(object):
+    __nucleus: int
+
+    def __init__(self, nucleus_num: int) -> None:
+        if not isinstance(nucleus_num, int):
+            raise ValueError("Number of nucleus in cell must be integer.")
+        self.__nucleus = nucleus_num if nucleus_num > 0 else 0
+
+    @property
+    def nucleus(self):
+        return self.__nucleus
+
+    def __add__(self, other: 'Cell'):
+        if not isinstance(other, Cell):
+            raise ValueError("You can add to a cell only another cell.")
+        return Cell(self.__nucleus + other.__nucleus)
+
+    def __sub__(self, other: 'Cell'):
+        if not isinstance(other, Cell):
+            raise ValueError("You can subtract from a cell only another cell.")
+        return Cell(self.__nucleus - other.__nucleus)
+
+    def __mul__(self, other: 'Cell'):
+        if not isinstance(other, Cell):
+            raise ValueError("You can subtract from a cell only another cell.")
+        return Cell(self.__nucleus * other.__nucleus)
+
+    def __truediv__(self, other: 'Cell'):
+        if not isinstance(other, Cell):
+            raise ValueError("You can subtract from a cell only another cell.")
+        return Cell(self.__nucleus // other.__nucleus)
+
+    def __str__(self):
+        return "*" * self.__nucleus
+
+    def make_order(self, row_len: int) -> str:
+        if not isinstance(row_len, int):
+            raise ValueError("Length of row must be integer.")
+        row = f"{'*' * row_len}\n"
+        return row * (self.__nucleus // row_len) + "*" * (self.__nucleus % row_len)
+
+
+def case_3():
+    cell1 = Cell(10)
+    cell2 = Cell(5)
+    print(f"{cell1} + {cell2} = {cell1 + cell2}")
+    print(f"{cell1} - {cell2} = {cell1 - cell2}")
+    print(f"{cell1} * {cell2} = {cell1 * cell2}")
+    print(f"{cell1} / {cell2} = {cell1 / cell2}\n")
+    print(f"{cell1}.make_order(3)\n\t=\n{cell1.make_order(3)}")
+
+
 if __name__ == "__main__":
-    # print("Задание 1:\n")
-    # case_1()
+    print("Задание 1:\n")
+    case_1()
     print("\nЗадание 2:\n")
     case_2()
+    print("\nЗадание 3:\n")
+    case_3()
