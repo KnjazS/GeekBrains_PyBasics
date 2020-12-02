@@ -3,7 +3,6 @@
 
 from typing import List
 from abc import ABC, abstractmethod
-from math import ceil
 
 
 # 1. Реализовать класс Matrix (матрица). Обеспечить перегрузку конструктора класса (метод init()), который должен
