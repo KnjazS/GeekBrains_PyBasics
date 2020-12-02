@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from typing import List
-
+from abc import ABC, abstractmethod
 
 # 1. Реализовать класс Matrix (матрица). Обеспечить перегрузку конструктора класса (метод init()), который должен
 # принимать данные (список списков) для формирования матрицы.
@@ -90,10 +90,51 @@ def case_1():
 # (V/6.5 + 0.5), для костюма (2*H + 0.3). Проверить работу этих методов на реальных данных. Реализовать общий подсчет
 # расхода ткани. Проверить на практике полученные на этом уроке знания: реализовать абстрактные классы для основных
 # классов проекта, проверить на практике работу декоратора @property.
+class Clothing(ABC):
+    @abstractmethod
+    def tissue_consumption(self):
+        pass
+
+
+class Coat(Clothing):
+    __size: int
+
+    def __init__(self, size: int):
+        if not isinstance(size, int):
+            raise ValueError("Size must be integer")
+        if size < 40 or size > 60:
+            raise ValueError("Wrong size")
+        self.__size = size
+
+    @property
+    def tissue_consumption(self) -> float:
+        return self.__size / 6.5 + 0.5
+
+
+class Suit(Clothing):
+    __height: int
+
+    def __init__(self, height: int):
+        if not isinstance(height, int):
+            raise ValueError("Height must be integer")
+        if height < 120 or height > 240:
+            raise ValueError("Wrong height")
+        self.__height = height
+
+    @property
+    def tissue_consumption(self) -> float:
+        return 2 * self.__height + 0.3
+
+
 def case_2():
-    pass
+    new_coat = Coat(48)
+    print(f"На пальто 48 размера уйдет {new_coat.tissue_consumption:.2f} ткани.")
+    new_suit = Suit(182)
+    print(f"Для костюма на рост 182 пойдёт {new_suit.tissue_consumption:.2f} ткани.")
 
 
 if __name__ == "__main__":
-    print("Задание 1:\n")
-    case_1()
+    # print("Задание 1:\n")
+    # case_1()
+    print("\nЗадание 2:\n")
+    case_2()
