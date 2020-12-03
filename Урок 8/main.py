@@ -3,6 +3,7 @@
 
 from abc import ABC, abstractmethod
 
+
 # 1. Реализовать класс «Дата», функция-конструктор которого должна принимать дату в виде строки формата
 # «день-месяц-год». В рамках класса реализовать два метода. Первый, с декоратором @classmethod, должен извлекать число,
 # месяц, год и преобразовывать их тип к типу «Число». Второй, с декоратором @staticmethod, должен проводить валидацию
@@ -88,7 +89,7 @@ def division(dividend: int, divider: int) -> float:
 
 def case_2():
     try:
-        x = division(5, 0)
+        division(5, 0)
     except MyZeroDivisionException as exc:
         print(f"Error detected: {exc}")
 
@@ -182,7 +183,7 @@ class Warehouse(object):
         self.__spaces_max = space_max
         self.__spaces_used = 0
         self.__stored = {}
-        self.__spaces = [True for i in range(self.__spaces_max)]
+        self.__spaces = [True for _ in range(self.__spaces_max)]
 
     def store(self, unit: OfficeEquip) -> None:
         for idx in range(self.__spaces_max - unit.space):
@@ -338,12 +339,53 @@ def case_4_6():
     print(f"Он снабжен: {unit.equipment}")
 
 
+# 7. Реализовать проект «Операции с комплексными числами». Создайте класс «Комплексное число», реализуйте перегрузку
+# методов сложения и умножения комплексных чисел. Проверьте работу проекта, создав экземпляры класса (комплексные числа)
+# и выполнив сложение и умножение созданных экземпляров. Проверьте корректность полученного результата.
+class ComplexNumber:
+    __real: float
+    __complex: float
+
+    def __init__(self, real_part: float, complex_part: float):
+        if not (isinstance(real_part, float) or isinstance(real_part, int)):
+            raise TypeError("real part must be float")
+        if not (isinstance(complex_part, float) or isinstance(complex_part, int)):
+            raise TypeError("complex part must be float")
+        self.__real = real_part
+        self.__complex = complex_part
+
+    def __str__(self):
+        return f"{self.__real} {f'- {-self.__complex}' if self.__complex < 0 else f'+ {self.__complex}'}i"
+
+    def __add__(self, other):
+        return ComplexNumber(self.__real + other.__real, self.__complex + other.__complex)
+
+    def __sub__(self, other):
+        return ComplexNumber(self.__real - other.__real, self.__complex - other.__complex)
+
+    def __mul__(self, other):
+        return ComplexNumber(self.__real * other.__real - self.__complex * other.__complex,
+                             self.__real * other.__complex + self.__complex * other.__real)
+
+
+def case_7():
+    print("a = 1+1i, b = 2+3i")
+    complex_number = ComplexNumber(1, 1) + ComplexNumber(2, 3)
+    print("a + b =", complex_number)
+    complex_number = ComplexNumber(1, 1) - ComplexNumber(2, 3)
+    print("a - b =", complex_number)
+    complex_number = ComplexNumber(1, 1) * ComplexNumber(2, 3)
+    print("a * b =", complex_number)
+
+
 if __name__ == "__main__":
-    # print("Задание 1:\n")
-    # case_1()
-    # print("\nЗадание 2:\n")
-    # case_2()
-    # print("\nЗадание 3:\n")
-    # case_3()
+    print("Задание 1:\n")
+    case_1()
+    print("\nЗадание 2:\n")
+    case_2()
+    print("\nЗадание 3:\n")
+    case_3()
     print("\nЗадание 4-6:\n")
     case_4_6()
+    print("\nЗадание 7:\n")
+    case_7()
