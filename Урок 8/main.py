@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+from abc import ABC, abstractmethod
+
 # 1. Реализовать класс «Дата», функция-конструктор которого должна принимать дату в виде строки формата
 # «день-месяц-год». В рамках класса реализовать два метода. Первый, с декоратором @classmethod, должен извлекать число,
 # месяц, год и преобразовывать их тип к типу «Число». Второй, с декоратором @staticmethod, должен проводить валидацию
@@ -133,10 +135,178 @@ def case_3():
     print(f"Введены числа {numbers}")
 
 
+# 4. Начните работу над проектом «Склад оргтехники». Создайте класс, описывающий склад. А также класс «Оргтехника»,
+# который будет базовым для классов-наследников. Эти классы — конкретные типы оргтехники (принтер, сканер, ксерокс).
+# В базовом классе определить параметры, общие для приведенных типов. В классах-наследниках реализовать параметры,
+# уникальные для каждого типа оргтехники.
+class OfficeEquip(ABC):
+    __name: str
+    __space: int
+
+    def __init__(self, name: str, space: int):
+        if not isinstance(name, str):
+            raise TypeError("name param must be str.")
+        if not isinstance(space, int):
+            raise TypeError("space param must be int.")
+        self.__name = name
+        self.__space = space
+
+    @property
+    @abstractmethod
+    def space(self):
+        return self.__space
+
+    @property
+    def name(self):
+        return self.__name
+
+
+class Warehouse(object):
+    __spaces_max: int
+    __spaces_used: int
+    __stored: dict[int, OfficeEquip]
+    __spaces: list[bool]
+    __name: str
+
+    def __init__(self, name: str, space_max: int):
+        if not isinstance(name, str):
+            raise TypeError("name param must be str.")
+        if not isinstance(space_max, int):
+            raise TypeError("space_max param must be integer.")
+        self.__name = name
+        self.__spaces_max = space_max
+        self.__spaces_used = 0
+        self.__stored = {}
+        self.__spaces = [True for i in range(self.__spaces_max)]
+
+    def store(self, unit: OfficeEquip) -> None:
+        for idx in range(self.__spaces_max - unit.space):
+            if self.__spaces[idx]:
+                can_place_here = True
+                for idx2 in range(1, unit.space):
+                    if not self.__spaces[idx + idx2]:
+                        can_place_here = False
+                        break
+                if can_place_here:
+                    self.__stored[idx] = unit
+                    self.__spaces_used += unit.space
+                    for idx2 in range(unit.space):
+                        self.__spaces[idx + idx2] = False
+                    return
+        raise ValueError("Unable to store item.")
+
+    def take(self, place: int) -> OfficeEquip:
+        try:
+            value = self.__stored.pop(place)
+        except KeyError:
+            raise KeyError(f"Nothing stored at place {place} at warehouse \"{self.__name}\".")
+        for idx in range(value.space):
+            self.__spaces[place + idx] = True
+        self.__spaces_used -= value.space
+        return value
+
+    def list(self) -> dict[int, OfficeEquip]:
+        return self.__stored.copy()
+
+    def __str__(self):
+        return f"Склад {self.__name} ({self.__spaces_used}/{self.__spaces_max})"
+
+    def print_used_space(self):
+        for space in self.__spaces:
+            print("_", end='') if space else print("*", end="")
+        print("")
+
+
+class PC(OfficeEquip):
+    def __init__(self, name, space):
+        super().__init__(name, space)
+
+    @property
+    def space(self):
+        return super().space
+
+    def __str__(self):
+        return f"Компьютер {super().name}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class Printer(OfficeEquip):
+    def __init__(self, name, space):
+        super().__init__(name, space)
+
+    @property
+    def space(self):
+        return super().space
+
+    def __str__(self):
+        return f"Принтер {super().name}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class Scanner(OfficeEquip):
+    def __init__(self, name, space):
+        super().__init__(name, space)
+
+    @property
+    def space(self):
+        return super().space
+
+    def __str__(self):
+        return f"Сканер {super().name}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class MultiFunctionalDevice(OfficeEquip):
+    def __init__(self, name, space):
+        super().__init__(name, space)
+
+    @property
+    def space(self):
+        return super().space
+
+    def __str__(self):
+        return f"МФУ {super().name}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+def case_4():
+    new_warehouse = Warehouse("Главный", 50)
+    print(f"{new_warehouse} открыт.")
+    print("Начата загрузка склада.")
+    load = [PC("HP Elite 7300", 2),
+            PC("HP Elite 7500", 2),
+            PC("HP Elite 7500", 2),
+            Printer("HP LaserJet Pro M402", 1),
+            Printer("HP LaserJet Pro M402", 1),
+            MultiFunctionalDevice("HP LaserJet M28w", 1)]
+    for comp in load:
+        new_warehouse.store(comp)
+    print(f"Загружено 3 компьютера, 2 принтера и МФУ. {new_warehouse}\nЗагрузка склада: ", end="")
+    new_warehouse.print_used_space()
+    print(f"Забрали 1 компьютер: {new_warehouse.take(0)} из {new_warehouse}\nЗагрузка склада: ", end="")
+    new_warehouse.print_used_space()
+    load = [Printer("HP LaserJet Pro M402", 1),
+            Printer("HP LaserJet Pro M402", 1)]
+    for comp in load:
+        new_warehouse.store(comp)
+    print(f"Загружено ещё 2 принтера. {new_warehouse}\nЗагрузка склада: ", end="")
+    new_warehouse.print_used_space()
+
+
 if __name__ == "__main__":
     # print("Задание 1:\n")
     # case_1()
     # print("\nЗадание 2:\n")
     # case_2()
-    print("\nЗадание 3:\n")
-    case_3()
+    # print("\nЗадание 3:\n")
+    # case_3()
+    print("\nЗадание 4:\n")
+    case_4()
