@@ -70,6 +70,29 @@ def case_1():
         print(f"Обработана дата {Date(correct_value)}")
 
 
+# 2. Создайте собственный класс-исключение, обрабатывающий ситуацию деления на нуль. Проверьте его работу на данных,
+# вводимых пользователем. При вводе пользователем нуля в качестве делителя программа должна корректно обработать эту
+# ситуацию и не завершиться с ошибкой.
+class MyZeroDivisionException(Exception):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+
+def division(dividend: int, divider: int) -> float:
+    if divider == 0:
+        raise MyZeroDivisionException(f"Unable to divide: {dividend} / {divider} ")
+    return dividend / divider
+
+
+def case_2():
+    try:
+        x = division(5, 0)
+    except MyZeroDivisionException as exc:
+        print(f"Error detected: {exc}")
+
+
 if __name__ == "__main__":
-    print("Задание 1:\n")
-    case_1()
+    # print("Задание 1:\n")
+    # case_1()
+    print("\nЗадание 2:\n")
+    case_2()
