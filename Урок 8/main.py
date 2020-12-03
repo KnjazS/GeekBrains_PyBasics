@@ -139,6 +139,11 @@ def case_3():
 # который будет базовым для классов-наследников. Эти классы — конкретные типы оргтехники (принтер, сканер, ксерокс).
 # В базовом классе определить параметры, общие для приведенных типов. В классах-наследниках реализовать параметры,
 # уникальные для каждого типа оргтехники.
+# 5. Продолжить работу над первым заданием. Разработать методы, отвечающие за приём оргтехники на склад и передачу в
+# определенное подразделение компании. Для хранения данных о наименовании и количестве единиц оргтехники, а также других
+# данных, можно использовать любую подходящую структуру, например словарь.
+# 6. Продолжить работу над вторым заданием. Реализуйте механизм валидации вводимых пользователем данных. Например, для
+# указания количества принтеров, отправленных на склад, нельзя использовать строковый тип данных.
 class OfficeEquip(ABC):
     __name: str
     __space: int
@@ -277,7 +282,32 @@ class MultiFunctionalDevice(OfficeEquip):
         return self.__str__()
 
 
-def case_4():
+class Unit(object):
+    __name: str
+    __equip: list[OfficeEquip]
+
+    def __init__(self, name: str):
+        if not isinstance(name, str):
+            raise TypeError("Name of the unit must be str.")
+        self.__name = name
+        self.__equip = []
+
+    def __str__(self):
+        return f"Подразделение {self.__name}. Снабжено {len(self.__equip)} единицами техники."
+
+    def take_from_warehouse(self, warehouse: Warehouse, place: int):
+        if not isinstance(warehouse, Warehouse):
+            raise TypeError("warehouse param must be instance of Warehouse class.")
+        if not isinstance(place, int):
+            raise TypeError("place param must be int.")
+        self.__equip.append(warehouse.take(place))
+
+    @property
+    def equipment(self):
+        return str(self.__equip)[1:-1]
+
+
+def case_4_6():
     new_warehouse = Warehouse("Главный", 50)
     print(f"{new_warehouse} открыт.")
     print("Начата загрузка склада.")
@@ -291,7 +321,9 @@ def case_4():
         new_warehouse.store(comp)
     print(f"Загружено 3 компьютера, 2 принтера и МФУ. {new_warehouse}\nЗагрузка склада: ", end="")
     new_warehouse.print_used_space()
-    print(f"Забрали 1 компьютер: {new_warehouse.take(0)} из {new_warehouse}\nЗагрузка склада: ", end="")
+    unit = Unit("Отдел кадров")
+    unit.take_from_warehouse(new_warehouse, 0)
+    print(f"Отдел кадров забрали 1 компьютер из {new_warehouse}\nЗагрузка склада: ", end="")
     new_warehouse.print_used_space()
     load = [Printer("HP LaserJet Pro M402", 1),
             Printer("HP LaserJet Pro M402", 1)]
@@ -299,6 +331,11 @@ def case_4():
         new_warehouse.store(comp)
     print(f"Загружено ещё 2 принтера. {new_warehouse}\nЗагрузка склада: ", end="")
     new_warehouse.print_used_space()
+    unit.take_from_warehouse(new_warehouse, 2)
+    print(f"Отдел кадров забрали ещё 1 компьютер из {new_warehouse}\nЗагрузка склада: ", end="")
+    new_warehouse.print_used_space()
+    print(f"Теперь об отделе кадров\n{unit}")
+    print(f"Он снабжен: {unit.equipment}")
 
 
 if __name__ == "__main__":
@@ -308,5 +345,5 @@ if __name__ == "__main__":
     # case_2()
     # print("\nЗадание 3:\n")
     # case_3()
-    print("\nЗадание 4:\n")
-    case_4()
+    print("\nЗадание 4-6:\n")
+    case_4_6()
